@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Michael Puckett</Authors>
+    <Company>TripleG3</Company>
+    <Description>Attribute based dependency injection.</Description>
+    <Copyright>2019</Copyright>
+    <PackageProjectUrl>https://github.com/MichaelPuckett2/Specky</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MichaelPuckett2/Specky</RepositoryUrl>
+    <RepositoryType>dotnet standard library</RepositoryType>
+    <PackageTags>DI, Dependency Injection</PackageTags>
   </PropertyGroup>
 
 </Project>
