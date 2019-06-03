@@ -20,7 +20,7 @@ namespace Specky
 
         public T GetSpeck<T>() => (T)GetSpeck(typeof(T));
 
-        internal object GetSpeck(Type type)
+        public object GetSpeck(Type type)
         {
             object result = InjectionModels
                 .Where(x => (x.Type == type) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance))
@@ -104,56 +104,6 @@ namespace Specky
             }
 
             return false;
-        }
-
-        private bool CanTypeDeriveFromInterface(Type intr, Type type)
-        {
-            // EX:
-            // intr = IInterface<object>
-            // type = IntegerfaceImpl<T>
-            var x = intr.ContainsGenericParameters; // false
-            var y = type.ContainsGenericParameters; // true
-
-            var xx = intr.IsConstructedGenericType; // true
-            var yy = type.IsConstructedGenericType; // false
-
-            var xxx = intr.IsGenericParameter; // false
-            var yyy = type.IsGenericParameter; // false
-
-            var xxxx = intr.IsGenericType; // true
-            var yyyy = type.IsGenericType; // true
-
-            var xxxxx = intr.IsGenericTypeDefinition; // false
-            var yyyyy = type.IsGenericTypeDefinition; // true
-
-            if (intr.IsGenericType)
-            {
-                Type[] typeArgumentsIntr = intr.GetGenericArguments();
-                // object parameter
-                // IsGenericParameter = false
-                // IsGenericTypeParameter = false
-                // IsTypeDefinition = true
-            }
-
-            if (type.IsGenericType)
-            {
-                Type[] typeArgumentsType = type.GetGenericArguments();
-                // T parameter
-                // IsGenericParameter = true
-                // IsGenericTypeParameter = true
-                // IsTypeDefinition = false
-
-                var interfaces = type.GetInterfaces();
-                foreach (var intrf in interfaces)
-                {
-                    if (intrf == intr)
-                    {
-                        var asdf = 10;
-                    }
-                }
-            }
-
-            return intr.IsAssignableFrom(type);
         }
 
         ~SpeckyContainer()
