@@ -12,9 +12,9 @@
     <PackageTags>DI, Dependency Injection, Specky, Speck</PackageTags>
     <PackageReleaseNotes>This version only has constructor based injection, using attributes.
 1.0.0.1 - GetSpeck(Type type) available.</PackageReleaseNotes>
-    <AssemblyVersion>1.0.0.1</AssemblyVersion>
-    <FileVersion>1.0.0.1</FileVersion>
-    <Version>1.0.0.1</Version>
+    <AssemblyVersion>1.0.1.1</AssemblyVersion>
+    <FileVersion>1.0.1.1</FileVersion>
+    <Version>1.0.1.1</Version>
   </PropertyGroup>
 
 </Project>
