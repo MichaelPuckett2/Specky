@@ -54,6 +54,13 @@ namespace Specky
             return result;
         }
 
+        public object GetSpeck(string typeName)
+        {
+            var model = InjectionModels.FirstOrDefault(x => x.Type.Name == typeName);
+            if (model == null) throw new Exception($"Specky has no registered types with name {typeName}");
+            return GetSpeck(model.Type);
+        }
+
         private InjectionModel GetExistingModel(Type type)
         {
             InjectionModel existingModel;
