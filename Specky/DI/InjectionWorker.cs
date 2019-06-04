@@ -14,13 +14,20 @@ namespace Specky.DI
 
         internal void Start()
         {
-            var tuples = new List<(Type Type, SpeckAttribute Attribute)> ();
+            var tuples = new List<(Type Type, SpeckAttribute Attribute)>();
             foreach (var assembly in StrappingAssemblies)
                 tuples.AddRange(assembly.TypesWithAttribute<SpeckAttribute>());
 
             tuples
                 .Log("Injecting Specks.", PrintType.DebugWindow)
-                .ForEach((tuple) => SpeckyContainer.Instance.InjectSpeck(new InjectionModel(tuple.Type, tuple.Attribute.DeliveryMode)));
+                .ForEach((tuple) =>
+                {
+                    var speckName = tuple.Attribute is SpeckNameAttribute speckNameAttribute
+                                  ? speckNameAttribute.SpeckName
+                                  : "";
+
+                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(tuple.Type, tuple.Attribute.DeliveryMode, default, speckName));
+                });
 
             tuples
                 .Log("Testing Specks", PrintType.DebugWindow)

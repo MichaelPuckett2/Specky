@@ -14,7 +14,7 @@ namespace Specky
         SpeckyContainer() { }
         static public SpeckyContainer Instance { get; } = new SpeckyContainer();
 
-        public void InjectSpeck(Type type) => InjectSpeck(new InjectionModel(type));
+        public void InjectSpeck(Type type, string speckName = "") => InjectSpeck(new InjectionModel(type, default, default, speckName));
 
         internal void InjectSpeck(InjectionModel injectionModel)
         {
@@ -86,7 +86,7 @@ namespace Specky
             var model = models.FirstOrDefault();
             if (model == null)
             {
-                throw new Exception($"Specky has no registered types with name {typeName}\nIf this is a unique name try using the SpeckName(speckName) attribute.");
+                throw new Exception($"Specky has no registered types with name '{typeName}'.\nIf this is a unique name try using the SpeckName(speckName) attribute.");
             }
             return GetSpeck(model.Type);
         }
