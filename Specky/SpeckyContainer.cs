@@ -14,74 +14,101 @@ namespace Specky
         SpeckyContainer() { }
         static public SpeckyContainer Instance { get; } = new SpeckyContainer();
 
-        public void Inject(Type type) => Inject(new InjectionModel(type));
+        public void InjectSpeck(Type type) => InjectSpeck(new InjectionModel(type));
 
-        internal void Inject(InjectionModel injectionModel) => InjectionModels.Add(injectionModel);
+        internal void InjectSpeck(InjectionModel injectionModel)
+        {
+            lock (this)
+            {
+                if (!string.IsNullOrWhiteSpace(injectionModel.SpeckName))
+                {
+                    var hasExistingSpeckName = InjectionModels.Any(x => x.SpeckName == injectionModel.SpeckName);
+                    if (hasExistingSpeckName) throw new Exception($"A Speck already exists with a unique name of {injectionModel.SpeckName}\nOnly one unique name is allowed per Speck using the SpeckNameAttribute");
+                }
+                InjectionModels.Add(injectionModel);
+            }
+        }
 
         public T GetSpeck<T>() => (T)GetSpeck(typeof(T));
 
         public object GetSpeck(Type type)
-        {
-            object result = InjectionModels
-                .Where(x => (x.Type == type) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance))
-                .FirstOrDefault();
+        { 
+            GetInstantiatedSpeck(type, out object speck);
 
-            if (result != null) return result;
+            if (speck != null) return speck;
 
-            InjectionModel existingModel;
+            GetExistingModel(type, out InjectionModel uninstantiatedModel);
 
-            existingModel = GetExistingModel(type);
-
-            switch (existingModel.DeliveryMode)
+            switch (uninstantiatedModel.DeliveryMode)
             {
                 case DeliveryMode.PerRequest:
-                    result = SpeckActivator.InstantiateSpeck(type, existingModel, HasSpeck, GetSpeck);
+                    speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck);
                     break;
 
                 case DeliveryMode.SingleInstance:
                 default:
-                    var instantiatedSpeck = SpeckActivator.InstantiateSpeck(type, existingModel, HasSpeck, GetSpeck);
-                    var newModel = new InjectionModel(existingModel.Type, instantiatedSpeck, DeliveryMode.SingleInstance);
+                    speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck);
+                    var (speckType, deliveryMode, _, speckName) = uninstantiatedModel;
+                    var instantiatedModel = new InjectionModel(speckType, deliveryMode, speck, speckName);
                     lock (this)
                     {
-                        InjectionModels.Remove(existingModel);
-                        InjectionModels.Add(newModel);
+                        InjectionModels.Remove(uninstantiatedModel);
+                        InjectionModels.Add(instantiatedModel);
                     }
-                    result = newModel.Instance;
                     break;
             }
 
-            return result;
+            return speck;
+        }
+
+        private void GetInstantiatedSpeck(Type type, out object speck)
+        {
+            lock (this)
+            {
+                speck = InjectionModels
+                       .Where(x => (x.Type == type) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance))
+                       .Select(x => x.Instance)
+                       .FirstOrDefault();
+            }
         }
 
         public object GetSpeck(string typeName)
         {
-            var model = InjectionModels.FirstOrDefault(x => x.Type.Name == typeName);
-            if (model == null) throw new Exception($"Specky has no registered types with name {typeName}");
+            IReadOnlyList<InjectionModel> models;
+            lock (this)
+            {
+                models = InjectionModels.Where(x => x.Type.Name == typeName || x.SpeckName == typeName).ToList();
+            }
+            if (models.Count > 1)
+            {
+                throw new Exception($"More than one Speck found with name of {typeName}.\nIt is recommended that all types have unique names.\nIf types must have the same name then define a unique name for each Speck with the SpeckName(speckName) attribute.");
+            }
+            var model = models.FirstOrDefault();
+            if (model == null)
+            {
+                throw new Exception($"Specky has no registered types with name {typeName}\nIf this is a unique name try using the SpeckName(speckName) attribute.");
+            }
             return GetSpeck(model.Type);
         }
 
-        private InjectionModel GetExistingModel(Type type)
+        private void GetExistingModel(Type type, out InjectionModel model)
         {
-            InjectionModel existingModel;
             if (type.IsInterface)
             {
                 lock (this)
                 {
-                    existingModel = InjectionModels.FirstOrDefault(x => IsAssignable(type, x.Type))
-                                 ?? throw new Exception($"Type: {type.Name} not injected.");
+                    model = InjectionModels.FirstOrDefault(x => IsAssignable(type, x.Type))
+                         ?? throw new Exception($"Type: {type.Name} not injected.");
                 }
             }
             else
             {
                 lock (this)
                 {
-                    existingModel = InjectionModels.FirstOrDefault(x => x.Type == type)
-                             ?? throw new Exception($"Type: {type.Name} not injected.");
+                    model = InjectionModels.FirstOrDefault(x => x.Type == type)
+                         ?? throw new Exception($"Type: {type.Name} not injected.");
                 }
             }
-
-            return existingModel;
         }
 
         internal bool HasSpeck(Type parameterType)

@@ -30,6 +30,7 @@ namespace Specky.DI
                 try
                 {
                     instantiatedSpeck = Activator.CreateInstance(existingModel.Type, instantiatedParameters);
+                    break;
                 }
                 catch (Exception exception)
                 {
@@ -45,8 +46,8 @@ namespace Specky.DI
         {
             var typeArgs = requestedType.GetGenericArguments();
             var genericType = existingModel.Type.MakeGenericType(typeArgs);
-            var (_, instance, deliveryMode) = existingModel;
-            existingModel = new InjectionModel(genericType, instance, deliveryMode);
+            var (_, deliveryMode, instance, speckName) = existingModel;
+            existingModel = new InjectionModel(genericType, deliveryMode, instance, speckName);
         }
     }
 }

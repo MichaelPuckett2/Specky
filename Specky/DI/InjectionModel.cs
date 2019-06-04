@@ -8,24 +8,28 @@ namespace Specky.DI
     /// </summary>
     internal class InjectionModel
     {
-        public InjectionModel(Type type) : this(type, default, default) { }
-        public InjectionModel(Type type, DeliveryMode deliveryMode) : this(type, default, deliveryMode) { }
-        public InjectionModel(Type type, object instance, DeliveryMode deliveryMode)
+        public InjectionModel(Type type) : this(type, default) { }
+        public InjectionModel(Type type, DeliveryMode deliveryMode) : this(type, deliveryMode, default) { }
+        public InjectionModel(Type type, DeliveryMode deliveryMode, object instance) : this(type, deliveryMode, instance, default) { }
+        public InjectionModel(Type type, DeliveryMode deliveryMode, object instance, string speckName)
         {
             Type = type;
-            Instance = instance;
             DeliveryMode = deliveryMode;
+            Instance = instance;
+            SpeckName = speckName;
         }
 
-        public void Deconstruct(out Type type, out object instance, out DeliveryMode deliveryMode)
+        public void Deconstruct(out Type type, out DeliveryMode deliveryMode, out object instance, out string speckName)
         {
             type = Type;
-            instance = Instance;
             deliveryMode = DeliveryMode;
+            instance = Instance;
+            speckName = SpeckName;
         }
 
         public Type Type { get; }
         public object Instance { get; }
         public DeliveryMode DeliveryMode { get; }
+        public string SpeckName { get; }
     }
 }

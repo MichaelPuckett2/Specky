@@ -20,7 +20,7 @@ namespace Specky.DI
 
             tuples
                 .Log("Injecting Specks.", PrintType.DebugWindow)
-                .ForEach((tuple) => SpeckyContainer.Instance.Inject(new InjectionModel(tuple.Type, tuple.Attribute.DeliveryMode)));
+                .ForEach((tuple) => SpeckyContainer.Instance.InjectSpeck(new InjectionModel(tuple.Type, tuple.Attribute.DeliveryMode)));
 
             tuples
                 .Log("Testing Specks", PrintType.DebugWindow)
