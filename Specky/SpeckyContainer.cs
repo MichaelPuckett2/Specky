@@ -1,9 +1,9 @@
 ﻿using Specky.DI;
 using Specky.Enums;
-using Specky.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Specky
 {
@@ -61,6 +61,9 @@ namespace Specky
             return speck;
         }
 
+        public Task<object> GetSpeckAsync(Type type)
+            => Task.Run(() => GetSpeck(type));
+
         private void GetInstantiatedSpeck(Type type, out object speck)
         {
             lock (this)
@@ -90,6 +93,9 @@ namespace Specky
             }
             return GetSpeck(model.Type);
         }
+
+        public Task<object> GetSpeckAsync(string typeName)
+            => Task.Run(() => GetSpeck(typeName));
 
         private void GetExistingModel(Type type, out InjectionModel model)
         {

@@ -3,7 +3,9 @@ using Specky.Enums;
 using Specky.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Specky.DI
 {
@@ -33,10 +35,24 @@ namespace Specky.DI
                 .Log("Testing Specks", PrintType.DebugWindow)
                 .ForEach((tuple) =>
                 {
-                    foreach (var constructor in tuple.Type.GetConstructors())
+                    var constructors = tuple.Type.GetConstructors().ToList();
+                    var failedCount = 0;
+                    var parameters = new StringBuilder();
+                    foreach (var constructor in constructors)
+                    {
                         foreach (var parameter in constructor.GetParameters())
+                        {
                             if (!SpeckyContainer.Instance.HasSpeck(parameter.ParameterType))
-                                throw new Exception($"Specky will not be able to initialize {tuple.Type.Name} with parameter {parameter.ParameterType.Name}");
+                            {
+                                failedCount++;
+                                parameters.AppendLine(parameter.ParameterType.Name);
+                            }
+                        }
+                    }
+                    if (failedCount == constructors.Count)
+                    {
+                        throw new Exception($"Specky has examined all possible constructors for {tuple.Type.Name}.\nThere are no registered types to warrant initialization of any overloaded constructor.\nParameters expected:\n{parameters.ToString()}");
+                    }
                 });
         }
     }
