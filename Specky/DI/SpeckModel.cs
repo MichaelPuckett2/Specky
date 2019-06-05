@@ -32,4 +32,16 @@ namespace Specky.DI
         public DeliveryMode DeliveryMode { get; }
         public string SpeckName { get; }
     }
+
+    internal class InjectConfigurationModel : InjectionModel
+    {
+        public InjectConfigurationModel(Type type, Type parameterType, string configurationName) : base(type, DeliveryMode.DataSet)
+        {
+            ParameterType = parameterType;
+            ConfigurationName = configurationName;
+        }
+
+        public Type ParameterType { get; }
+        public string ConfigurationName { get; }
+    }
 }

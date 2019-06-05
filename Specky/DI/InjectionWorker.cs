@@ -1,5 +1,6 @@
 ﻿using Specky.Attributes;
 using Specky.Enums;
+using Specky.Exceptions;
 using Specky.Extensions;
 using System;
 using System.Collections.Generic;
@@ -16,44 +17,92 @@ namespace Specky.DI
 
         internal void Start()
         {
-            var tuples = new List<(Type Type, SpeckAttribute Attribute)>();
-            foreach (var assembly in StrappingAssemblies)
-                tuples.AddRange(assembly.TypesWithAttribute<SpeckAttribute>());
+            var tuples = (from assembly in StrappingAssemblies
+                          from tuple in assembly.TypesWithAttribute<SpeckAttribute>()
+                          select tuple).ToList().AsReadOnly();
 
             tuples
                 .Log("Injecting Specks.", PrintType.DebugWindow)
-                .ForEach((tuple) =>
-                {
-                    var speckName = tuple.Attribute is SpeckNameAttribute speckNameAttribute
-                                  ? speckNameAttribute.SpeckName
-                                  : "";
-
-                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(tuple.Type, tuple.Attribute.DeliveryMode, default, speckName));
-                });
+                .ForEach(InjectSpeck);
 
             tuples
                 .Log("Testing Specks", PrintType.DebugWindow)
-                .ForEach((tuple) =>
+                .ForEach(TestConstructors);
+        }
+
+        private static void InjectSpeck((Type Type, SpeckAttribute Attribute) tuple)
+        {
+            var (type, attribute) = tuple;
+
+            switch (attribute)
+            {
+                case SpeckyConfigurationAttribute configurationAttribute:
+                    var parameterTypes = type.GetProperties().Where(p => p.GetCustomAttribute<SpeckyConfigurationParametersAttribute>() != null).ToList().AsReadOnly();
+                    if (!parameterTypes.Any())
+                    {
+                        throw new SpeckyConfigurationException($"{nameof(SpeckyConfigurationAttribute)} must contain a {nameof(SpeckyConfigurationParametersAttribute)}. This is what Specky uses to inject the configuration for an expected type.");
+                    }                   
+                    SpeckyContainer.Instance.InjectSpeck(new InjectConfigurationModel(type, parameterTypes.FirstOrDefault().PropertyType, configurationAttribute.ConfigurationName));
+                    break;
+
+                case SpeckNameAttribute nameAttribute:
+                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, nameAttribute.SpeckName));
+                    break;
+
+                case SpeckAttribute speckAttribute:
+                default:
+                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode));
+                    break;
+            }
+        }
+
+        private static void TestConstructors((Type Type, SpeckAttribute Attribute) tuple)
+        {
+            var (type, attribute) = tuple;
+            var constructors = type.GetConstructors().ToList().AsReadOnly();            
+
+            if (attribute is SpeckyConfigurationAttribute)
+            {
+                if (constructors.Any(x => x.GetParameters().Any()))
                 {
-                    var constructors = tuple.Type.GetConstructors().ToList();
-                    var failedCount = 0;
-                    var parameters = new StringBuilder();
-                    foreach (var constructor in constructors)
+                    throw new SpeckyConfigurationException($"{nameof(SpeckyConfigurationAttribute)} cannot contain parameterized constructors.");
+                }
+
+                var hasValidParameters = false;
+                foreach (var configProperty in type.GetProperties())
+                {
+                    if (configProperty.GetCustomAttribute<SpeckyConfigurationParametersAttribute>() != null)
                     {
-                        foreach (var parameter in constructor.GetParameters())
-                        {
-                            if (!SpeckyContainer.Instance.HasSpeck(parameter.ParameterType))
-                            {
-                                failedCount++;
-                                parameters.AppendLine(parameter.ParameterType.Name);
-                            }
-                        }
+                        hasValidParameters = true;
+                        break;
                     }
-                    if (failedCount == constructors.Count)
+                }
+
+                if (!hasValidParameters)
+                {
+                    throw new SpeckyConfigurationException($"{nameof(SpeckyConfigurationAttribute)} must contain a {nameof(SpeckyConfigurationParametersAttribute)}. This is what Specky uses to inject the configuration for an expected type.");
+                }
+
+                return;
+            }
+
+            var failedCount = 0;
+            var parameters = new StringBuilder();
+            foreach (var constructor in constructors)
+            {
+                foreach (var parameter in constructor.GetParameters())
+                {
+                    if (!SpeckyContainer.Instance.HasSpeck(parameter.ParameterType))
                     {
-                        throw new Exception($"Specky has examined all possible constructors for {tuple.Type.Name}.\nThere are no registered types to warrant initialization of any overloaded constructor.\nParameters expected:\n{parameters.ToString()}");
+                        failedCount++;
+                        parameters.AppendLine(parameter.ParameterType.Name);
                     }
-                });
+                }
+            }
+            if (failedCount == constructors.Count)
+            {
+                throw new Exception($"Specky has examined all possible constructors for {type.Name}.\nThere are no registered types to warrant initialization of any overloaded constructor.\nParameters expected:\n{parameters.ToString()}");
+            }
         }
     }
 }

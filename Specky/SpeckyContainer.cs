@@ -1,8 +1,10 @@
-﻿using Specky.DI;
+﻿using Specky.Attributes;
+using Specky.DI;
 using Specky.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Specky
@@ -31,8 +33,10 @@ namespace Specky
 
         public T GetSpeck<T>() => (T)GetSpeck(typeof(T));
 
-        public object GetSpeck(Type type)
-        { 
+        public object GetSpeck(Type type, string configurationName = "")
+        {
+            if (TryGetConfigurationParameters(type, out object parameters, configurationName)) return parameters;
+
             GetInstantiatedSpeck(type, out object speck);
 
             if (speck != null) return speck;
@@ -42,12 +46,12 @@ namespace Specky
             switch (uninstantiatedModel.DeliveryMode)
             {
                 case DeliveryMode.PerRequest:
-                    speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck);
+                    speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck, HasParameterConfiguration, configurationName);
                     break;
 
                 case DeliveryMode.SingleInstance:
                 default:
-                    speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck);
+                    speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck, HasParameterConfiguration, configurationName);
                     var (speckType, deliveryMode, _, speckName) = uninstantiatedModel;
                     var instantiatedModel = new InjectionModel(speckType, deliveryMode, speck, speckName);
                     lock (this)
@@ -122,9 +126,58 @@ namespace Specky
             lock (this)
             {
                 return parameterType.IsInterface
-                    ? InjectionModels.FirstOrDefault(x => IsAssignable(parameterType, x.Type)) != null
-                    : InjectionModels.FirstOrDefault(x => x.Type == parameterType) != null;
+                     ? InjectionModels.Any(x => IsAssignable(parameterType, x.Type))
+                     : InjectionModels.Any(x => x.Type == parameterType);
             }
+        }
+
+        internal bool TryGetConfigurationParameters(Type parameterType, out object parametersInstance, string configurationName = "")
+        {
+            IEnumerable<InjectConfigurationModel> configurationModels;
+            lock (this)
+            {
+                configurationModels = InjectionModels
+                                     .Where(x => x is InjectConfigurationModel model && model.ParameterType == parameterType)
+                                     .Select(x => (InjectConfigurationModel)x)
+                                     .ToList()
+                                     .AsReadOnly();
+            }
+            if (!configurationModels.Any())
+            {
+                parametersInstance = default;
+                return false;
+            }
+
+            var configurationModel = configurationModels.FirstOrDefault(x => !string.IsNullOrWhiteSpace(configurationName) && x.ConfigurationName == configurationName)
+                                  ?? configurationModels.FirstOrDefault();
+
+            var config = Activator.CreateInstance(configurationModel.Type);
+
+            if (config == null)
+            {
+                parametersInstance = default;
+                return false;
+            }
+            var propertyInfo = config.GetType().GetProperties().Where(p => p.PropertyType == configurationModel.ParameterType).FirstOrDefault();
+            parametersInstance = propertyInfo?.GetValue(config);
+            return propertyInfo != null;
+        }
+
+        internal bool HasParameterConfiguration(ParameterInfo parameterInfo)
+        {
+            IEnumerable<InjectConfigurationModel> configurationModels;
+            lock (this)
+            {
+                configurationModels = InjectionModels
+                                     .Where(x => x is InjectConfigurationModel model && model.ParameterType == parameterInfo.ParameterType)
+                                     .Select(x => (InjectConfigurationModel)x)
+                                     .ToList()
+                                     .AsReadOnly();
+            }
+            if (!configurationModels.Any()) return false;
+            var configurationAttribute = parameterInfo.GetCustomAttribute<SpeckyConfigurationAttribute>();
+            if (configurationAttribute == null) return true;
+            return configurationModels.Any(x => x.ConfigurationName == configurationAttribute.ConfigurationName);
         }
 
         public static bool IsAssignable(Type requestedType, Type injectedType)

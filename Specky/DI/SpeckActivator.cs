@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Specky.Attributes;
+using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Specky.DI
 {
     internal class SpeckActivator
     {
-        internal static object InstantiateSpeck(Type requestedType, InjectionModel existingModel, Func<Type, bool> hasSpeck, Func<Type, object> getSpeck)
+        internal static object InstantiateSpeck(Type requestedType, InjectionModel existingModel, Func<Type, bool> hasSpeck, Func<Type, string, object> getSpeck, Func<ParameterInfo, bool> hasConfiguration, string configurationName)
         {
             object instantiatedSpeck = null;
             Exception innerException = null;
@@ -23,8 +25,8 @@ namespace Specky.DI
             {
                 var instantiatedParameters = constructor
                     .GetParameters()
-                    .Where(p => hasSpeck(p.ParameterType))
-                    .Select(p => getSpeck(p.ParameterType))
+                    .Where(p => hasSpeck(p.ParameterType) || hasConfiguration(p))
+                    .Select(p => getSpeck(p.ParameterType, p.GetCustomAttribute<SpeckyConfigurationAttribute>()?.ConfigurationName ?? configurationName))
                     .ToArray();
 
                 try
