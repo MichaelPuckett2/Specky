@@ -15,6 +15,7 @@ namespace Specky
 
         SpeckyContainer() { }
         static public SpeckyContainer Instance { get; } = new SpeckyContainer();
+        public string DefaultConfigurationName { get; private set; }
 
         public void InjectSpeck(Type type, string speckName = "") => InjectSpeck(new InjectionModel(type, default, default, speckName));
 
@@ -31,10 +32,12 @@ namespace Specky
             }
         }
 
-        public T GetSpeck<T>() => (T)GetSpeck(typeof(T));
+        public T GetSpeck<T>(string configurationName = "") => (T)GetSpeck(typeof(T), configurationName);
 
         public object GetSpeck(Type type, string configurationName = "")
         {
+            if (string.IsNullOrWhiteSpace(configurationName)) configurationName = DefaultConfigurationName;
+
             if (TryGetConfigurationParameters(type, out object parameters, configurationName)) return parameters;
 
             GetInstantiatedSpeck(type, out object speck);
@@ -178,6 +181,11 @@ namespace Specky
             var configurationAttribute = parameterInfo.GetCustomAttribute<SpeckyConfigurationAttribute>();
             if (configurationAttribute == null) return true;
             return configurationModels.Any(x => x.ConfigurationName == configurationAttribute.ConfigurationName);
+        }
+
+        internal void SetConfiguration(string configurationName)
+        {
+            DefaultConfigurationName = configurationName;
         }
 
         public static bool IsAssignable(Type requestedType, Type injectedType)

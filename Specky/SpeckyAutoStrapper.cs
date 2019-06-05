@@ -15,7 +15,7 @@ namespace Specky
         /// Note: It is important that this is performed first in your application and in the main application threading context.
         /// </summary>
         /// <param name="assemblies">Optional assemblies used to search for dependencies.</param>
-        public static void Start(IEnumerable<Assembly> assemblies = null)
+        public static void Start(IEnumerable<Assembly> assemblies = default, string configurationName = "")
         {
             lock (lockObject)
             {
@@ -31,7 +31,7 @@ namespace Specky
 
                 Log.Print("Strapping...", PrintType.DebugWindow);
 
-                new InjectionWorker(allAssemblies).Start();
+                new InjectionWorker(allAssemblies, configurationName).Start();
 
                 Log.Print("Strapped.", PrintType.DebugWindow);
             }
