@@ -10,12 +10,15 @@
     <RepositoryUrl>https://github.com/MichaelPuckett2/Specky</RepositoryUrl>
     <RepositoryType>dotnet standard library</RepositoryType>
     <PackageTags>DI, Dependency Injection, Specky, Speck</PackageTags>
-    <PackageReleaseNotes>This version only has constructor based injection, using attributes.
-1.0.0.1 - GetSpeck(Type type) available.
-1.0.3.4 - Added SpeckNameAttribute. Fixed CRITICAL bug in SpeckActivator.</PackageReleaseNotes>
-    <AssemblyVersion>1.0.3.4</AssemblyVersion>
-    <FileVersion>1.0.3.4</FileVersion>
-    <Version>1.0.3.4</Version>
+    <PackageReleaseNotes>Adding configurations to Specky with:
+SpeckyConfigurationAttribute(string configurationName) (class | parameter)
+SpeckyConfigurationParametersAttribute() (property)</PackageReleaseNotes>
+    <AssemblyVersion>1.0.4.5</AssemblyVersion>
+    <FileVersion>1.0.4.5</FileVersion>
+    <Version>1.0.4.5</Version>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageLicenseExpression></PackageLicenseExpression>
   </PropertyGroup>
 
 </Project>

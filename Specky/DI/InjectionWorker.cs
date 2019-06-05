@@ -13,12 +13,10 @@ namespace Specky.DI
     internal class InjectionWorker
     {
         private readonly IEnumerable<Assembly> StrappingAssemblies;
-        private readonly string ConfigurationName;
 
         internal InjectionWorker(IEnumerable<Assembly> strappingAssemblies, string configurationName)
         {
             StrappingAssemblies = strappingAssemblies;
-            ConfigurationName = configurationName;
             SpeckyContainer.Instance.SetConfiguration(configurationName);
         }
 
