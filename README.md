@@ -24,8 +24,6 @@
 
 --------------------------------------------------------------------------------------------------
 
-### Simple examples... There's more and much more coming.
-
 ### *Specky is open source and free to use and distribute.*
 
 > ### *I love, worship, and praise God with all my heart, might, and strength!* - **(Michael Brian Puckett, II)**
