@@ -10,12 +10,10 @@
     <RepositoryUrl>https://github.com/MichaelPuckett2/Specky</RepositoryUrl>
     <RepositoryType>dotnet standard library</RepositoryType>
     <PackageTags>DI, Dependency Injection, Specky, Speck</PackageTags>
-    <PackageReleaseNotes>Adding configurations to Specky with:
-SpeckyConfigurationAttribute(string configurationName) (class | parameter)
-SpeckyConfigurationParametersAttribute() (property)</PackageReleaseNotes>
-    <AssemblyVersion>1.0.4.5</AssemblyVersion>
-    <FileVersion>1.0.4.5</FileVersion>
-    <Version>1.0.4.5</Version>
+    <PackageReleaseNotes>SpeckyConditionAttribute (Customizable to allow specky to inject based on conditions)</PackageReleaseNotes>
+    <AssemblyVersion>1.0.5.6</AssemblyVersion>
+    <FileVersion>1.0.5.6</FileVersion>
+    <Version>1.0.5.6</Version>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression></PackageLicenseExpression>
