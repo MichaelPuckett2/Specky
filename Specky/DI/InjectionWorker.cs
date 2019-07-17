@@ -56,6 +56,13 @@ namespace Specky.DI
                     SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, nameAttribute.SpeckName));
                     break;
 
+                case SpeckConditionAttribute conditionAttribute:
+                    if (conditionAttribute.TestCondition())
+                    {
+                        SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode));
+                    }
+                    break;
+
                 case SpeckAttribute speckAttribute:
                 default:
                     SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode));
