@@ -5,18 +5,19 @@
     <Authors>Michael Puckett</Authors>
     <Company>TripleG3</Company>
     <Description>Attribute based dependency injection.</Description>
-    <Copyright>2019</Copyright>
+    <Copyright>2020</Copyright>
     <PackageProjectUrl>https://github.com/MichaelPuckett2/Specky</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MichaelPuckett2/Specky</RepositoryUrl>
     <RepositoryType>dotnet standard library</RepositoryType>
     <PackageTags>DI, Dependency Injection, Specky, Speck</PackageTags>
     <PackageReleaseNotes>SpeckyConditionAttribute (Customizable to allow specky to inject based on conditions)</PackageReleaseNotes>
-    <AssemblyVersion>1.0.5.6</AssemblyVersion>
-    <FileVersion>1.0.5.6</FileVersion>
-    <Version>1.0.5.6</Version>
+    <AssemblyVersion>1.0.5.8</AssemblyVersion>
+    <FileVersion>1.0.5.8</FileVersion>
+    <Version>1.0.5.8</Version>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression></PackageLicenseExpression>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
 </Project>
