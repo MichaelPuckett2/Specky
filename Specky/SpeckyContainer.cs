@@ -40,9 +40,7 @@ namespace Specky
 
             if (TryGetConfigurationParameters(type, out object parameters, configurationName)) return parameters;
 
-            GetInstantiatedSpeck(type, out object speck);
-
-            if (speck != null) return speck;
+            if (TryGetInstantiatedSpeck(type, out object speck)) return speck;
 
             GetExistingModel(type, out InjectionModel uninstantiatedModel);
 
@@ -71,15 +69,17 @@ namespace Specky
         public Task<object> GetSpeckAsync(Type type)
             => Task.Run(() => GetSpeck(type));
 
-        private void GetInstantiatedSpeck(Type type, out object speck)
+        private bool TryGetInstantiatedSpeck(Type type, out object speck)
         {
             lock (this)
             {
                 speck = InjectionModels
-                       .Where(x => (x.Type == type) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance))
+                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance))
                        .Select(x => x.Instance)
                        .FirstOrDefault();
             }
+
+            return speck != null;
         }
 
         public object GetSpeck(string typeName)
