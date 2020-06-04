@@ -118,7 +118,7 @@ namespace Specky
                 lock (this)
                 {
                     var configedModel = InjectionModels.FirstOrDefault(x => IsAssignable(type, x.Type) && x.Configuration == configuration);
-                    model = configedModel ?? InjectionModels.FirstOrDefault(x => IsAssignable(type, x.Type))
+                    model = configedModel ?? InjectionModels.FirstOrDefault(x => IsAssignable(type, x.Type) && string.IsNullOrWhiteSpace(x.Configuration))
                          ?? throw new Exception($"Type: {type.Name} not injected.");
                 }
             }
@@ -127,7 +127,7 @@ namespace Specky
                 lock (this)
                 {
                     var configedModel = InjectionModels.FirstOrDefault(x => x.Type == type && x.Configuration == configuration);
-                    model = configedModel ?? InjectionModels.FirstOrDefault(x => x.Type == type)
+                    model = configedModel ?? InjectionModels.FirstOrDefault(x => x.Type == type && string.IsNullOrWhiteSpace(x.Configuration))
                          ?? throw new Exception($"Type: {type.Name} not injected.");
                 }
             }
