@@ -48,8 +48,8 @@ namespace Specky.DI
         {
             var typeArgs = requestedType.GetGenericArguments();
             var genericType = existingModel.Type.MakeGenericType(typeArgs);
-            var (_, deliveryMode, instance, speckName) = existingModel;
-            existingModel = new InjectionModel(genericType, deliveryMode, instance, speckName);
+            var (_, deliveryMode, instance, speckName, configuration) = existingModel;
+            existingModel = new InjectionModel(genericType, deliveryMode, instance, speckName, configuration);
         }
     }
 }

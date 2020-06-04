@@ -13,11 +13,13 @@ namespace Specky.DI
     internal class InjectionWorker
     {
         private readonly IEnumerable<Assembly> StrappingAssemblies;
+        private readonly string Configuration;
 
         internal InjectionWorker(IEnumerable<Assembly> strappingAssemblies, string configurationName)
         {
             StrappingAssemblies = strappingAssemblies;
             SpeckyContainer.Instance.SetConfiguration(configurationName);
+            Configuration = configurationName;
         }
 
         internal void Start()
@@ -35,7 +37,7 @@ namespace Specky.DI
                 .ForEach(TestConstructors);
         }
 
-        private static void InjectSpeck((Type Type, SpeckAttribute Attribute) tuple)
+        private void InjectSpeck((Type Type, SpeckAttribute Attribute) tuple)
         {
             var (type, attribute) = tuple;
 
@@ -47,23 +49,23 @@ namespace Specky.DI
                     {
                         throw new SpeckyConfigurationException($"{nameof(SpeckyConfigurationAttribute)} must contain a {nameof(SpeckyConfigurationParametersAttribute)}. This is what Specky uses to inject the configuration for an expected type.");
                     }                   
-                    SpeckyContainer.Instance.InjectSpeck(new InjectConfigurationModel(type, parameterTypes.FirstOrDefault().PropertyType, configurationAttribute.ConfigurationName));
+                    SpeckyContainer.Instance.InjectSpeck(new InjectConfigurationModel(type, parameterTypes.FirstOrDefault().PropertyType, configurationAttribute.ConfigurationName, configurationAttribute.Configuration));
                     break;
 
                 case SpeckNameAttribute nameAttribute:
-                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, nameAttribute.SpeckName));
+                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, nameAttribute.SpeckName, nameAttribute.Configuration));
                     break;
 
                 case SpeckConditionAttribute conditionAttribute:
                     if (conditionAttribute.TestCondition())
                     {
-                        SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode));
+                        SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, default, conditionAttribute.Configuration));
                     }
                     break;
 
                 case SpeckAttribute speckAttribute:
                 default:
-                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode));
+                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, default, attribute.Configuration));
                     break;
             }
         }

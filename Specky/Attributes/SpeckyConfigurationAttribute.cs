@@ -13,7 +13,7 @@ namespace Specky.Attributes
         /// Initializes the SpeckyConfigurationAttribute with a configuration name.
         /// </summary>
         /// <param name="configurationName">Configuration name.</param>
-        public SpeckyConfigurationAttribute(string configurationName) : base(Enums.DeliveryMode.DataSet)
+        public SpeckyConfigurationAttribute(string configurationName) : base(Enums.DeliveryMode.DataSet, configurationName)
         {
             if (string.IsNullOrWhiteSpace(configurationName))
             {

@@ -17,7 +17,7 @@ namespace Specky
         static public SpeckyContainer Instance { get; } = new SpeckyContainer();
         public string DefaultConfigurationName { get; private set; }
 
-        public void InjectSpeck(Type type, string speckName = "") => InjectSpeck(new InjectionModel(type, default, default, speckName));
+        public void InjectSpeck(Type type, string speckName = "") => InjectSpeck(new InjectionModel(type, default, default, speckName, default));
 
         internal void InjectSpeck(InjectionModel injectionModel)
         {
@@ -40,9 +40,9 @@ namespace Specky
 
             if (TryGetConfigurationParameters(type, out object parameters, configurationName)) return parameters;
 
-            if (TryGetInstantiatedSpeck(type, out object speck)) return speck;
+            if (TryGetInstantiatedSpeck(type, configurationName, out object speck)) return speck;
 
-            GetExistingModel(type, out InjectionModel uninstantiatedModel);
+            GetExistingModel(type, configurationName, out InjectionModel uninstantiatedModel);
 
             switch (uninstantiatedModel.DeliveryMode)
             {
@@ -53,8 +53,8 @@ namespace Specky
                 case DeliveryMode.SingleInstance:
                 default:
                     speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck, HasParameterConfiguration, configurationName);
-                    var (speckType, deliveryMode, _, speckName) = uninstantiatedModel;
-                    var instantiatedModel = new InjectionModel(speckType, deliveryMode, speck, speckName);
+                    var (speckType, deliveryMode, _, speckName, configuration) = uninstantiatedModel;
+                    var instantiatedModel = new InjectionModel(speckType, deliveryMode, speck, speckName, configuration);
                     lock (this)
                     {
                         InjectionModels.Remove(uninstantiatedModel);
@@ -69,12 +69,19 @@ namespace Specky
         public Task<object> GetSpeckAsync(Type type)
             => Task.Run(() => GetSpeck(type));
 
-        private bool TryGetInstantiatedSpeck(Type type, out object speck)
+        private bool TryGetInstantiatedSpeck(Type type, string configuration, out object speck)
         {
             lock (this)
             {
-                speck = InjectionModels
+                var configedSpeck = InjectionModels
                        .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance))
+                       .Where(x => x.Configuration == configuration)
+                       .Select(x => x.Instance)
+                       .FirstOrDefault();
+
+                speck = configedSpeck ?? InjectionModels
+                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance))
+                       .Where(x => string.IsNullOrWhiteSpace(configuration))
                        .Select(x => x.Instance)
                        .FirstOrDefault();
             }
@@ -104,13 +111,14 @@ namespace Specky
         public Task<object> GetSpeckAsync(string typeName)
             => Task.Run(() => GetSpeck(typeName));
 
-        private void GetExistingModel(Type type, out InjectionModel model)
+        private void GetExistingModel(Type type, string configuration, out InjectionModel model)
         {
             if (type.IsInterface)
             {
                 lock (this)
                 {
-                    model = InjectionModels.FirstOrDefault(x => IsAssignable(type, x.Type))
+                    var configedModel = InjectionModels.FirstOrDefault(x => IsAssignable(type, x.Type) && x.Configuration == configuration);
+                    model = configedModel ?? InjectionModels.FirstOrDefault(x => IsAssignable(type, x.Type))
                          ?? throw new Exception($"Type: {type.Name} not injected.");
                 }
             }
@@ -118,7 +126,8 @@ namespace Specky
             {
                 lock (this)
                 {
-                    model = InjectionModels.FirstOrDefault(x => x.Type == type)
+                    var configedModel = InjectionModels.FirstOrDefault(x => x.Type == type && x.Configuration == configuration);
+                    model = configedModel ?? InjectionModels.FirstOrDefault(x => x.Type == type)
                          ?? throw new Exception($"Type: {type.Name} not injected.");
                 }
             }

@@ -9,7 +9,12 @@ namespace Specky.Attributes
     [AttributeUsage(AttributeTargets.Class)]
     public class SpeckAttribute : Attribute
     {
-        public SpeckAttribute(DeliveryMode deliveryMode = default) => DeliveryMode = deliveryMode;
+        public SpeckAttribute(DeliveryMode deliveryMode = default, string configuration = "")
+        {
+            DeliveryMode = deliveryMode;
+            Configuration = configuration;
+        }
         public DeliveryMode DeliveryMode { get; }
+        public string Configuration { get; }
     }
 }
