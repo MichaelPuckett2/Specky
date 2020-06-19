@@ -43,37 +43,84 @@ namespace Specky.DI
 
             switch (attribute)
             {
+                case SpeckyFactoryAttribute speckyFactoryAttribute:
+                    InjectFactorySpeck(type, attribute, speckyFactoryAttribute);
+                    break;
                 case SpeckyConfigurationAttribute configurationAttribute:
-                    var parameterTypes = type.GetProperties().Where(p => p.GetCustomAttribute<SpeckyConfigurationParametersAttribute>() != null).ToList().AsReadOnly();
-                    if (!parameterTypes.Any())
-                    {
-                        throw new SpeckyConfigurationException($"{nameof(SpeckyConfigurationAttribute)} must contain a {nameof(SpeckyConfigurationParametersAttribute)}. This is what Specky uses to inject the configuration for an expected type.");
-                    }                   
-                    SpeckyContainer.Instance.InjectSpeck(new InjectConfigurationModel(type, parameterTypes.FirstOrDefault().PropertyType, configurationAttribute.ConfigurationName, configurationAttribute.Configuration));
+                    InjectConfigurationSpeck(type, configurationAttribute);
                     break;
 
                 case SpeckNameAttribute nameAttribute:
-                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, nameAttribute.SpeckName, nameAttribute.Configuration));
+                    InjectNameSpeck(type, attribute, nameAttribute);
                     break;
 
                 case SpeckConditionAttribute conditionAttribute:
-                    if (conditionAttribute.TestCondition())
-                    {
-                        SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, default, conditionAttribute.Configuration));
-                    }
+                    InjectConditionSpeck(type, attribute, conditionAttribute);
                     break;
 
                 case SpeckAttribute speckAttribute:
                 default:
-                    SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, default, attribute.Configuration));
+                    InjectDefaultSpeck(type, attribute);
                     break;
             }
+        }
+
+        private void InjectFactorySpeck(Type type, SpeckAttribute attribute, SpeckyFactoryAttribute speckyFactoryAttribute)
+        {
+            InjectDefaultSpeck(type, attribute);
+            MethodInfo methodInfo;
+            try
+            {
+                methodInfo = type.GetMethod(speckyFactoryAttribute.FactoryMethodName);
+            }
+            catch
+            {
+                throw new SpeckyFactoryMethodNotFoundException(speckyFactoryAttribute.FactoryMethodName, type);
+            }
+
+            var speckType = methodInfo.ReturnType;
+            var getParameters = new Func<IEnumerable<Type>>(() => methodInfo.GetParameters().Select(x => x.ParameterType));
+            var getFactorySpeck = new Func<IEnumerable<Type>, object>((types) =>
+            {
+                var specks = new List<object>();
+                foreach (var t in types) specks.Add(SpeckyContainer.Instance.GetSpeck(t));
+                return methodInfo.Invoke(SpeckyContainer.Instance.GetSpeck(type), specks.ToArray());
+            });
+            SpeckyContainer.Instance.InjectSpeck(new InjectFactoryModel(getParameters, getFactorySpeck, speckType, attribute.DeliveryMode, attribute.Configuration));
+        }
+
+        private static void InjectDefaultSpeck(Type type, SpeckAttribute attribute)
+        {
+            SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, default, attribute.Configuration));
+        }
+
+        private static void InjectConditionSpeck(Type type, SpeckAttribute attribute, SpeckConditionAttribute conditionAttribute)
+        {
+            if (conditionAttribute.TestCondition())
+            {
+                SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, default, conditionAttribute.Configuration));
+            }
+        }
+
+        private static void InjectNameSpeck(Type type, SpeckAttribute attribute, SpeckNameAttribute nameAttribute)
+        {
+            SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, nameAttribute.SpeckName, nameAttribute.Configuration));
+        }
+
+        private static void InjectConfigurationSpeck(Type type, SpeckyConfigurationAttribute configurationAttribute)
+        {
+            var parameterTypes = type.GetProperties().Where(p => p.GetCustomAttribute<SpeckyConfigurationParametersAttribute>() != null).ToList().AsReadOnly();
+            if (!parameterTypes.Any())
+            {
+                throw new SpeckyConfigurationException($"{nameof(SpeckyConfigurationAttribute)} must contain a {nameof(SpeckyConfigurationParametersAttribute)}. This is what Specky uses to inject the configuration for an expected type.");
+            }
+            SpeckyContainer.Instance.InjectSpeck(new InjectConfigurationModel(type, parameterTypes.FirstOrDefault().PropertyType, configurationAttribute.ConfigurationName, configurationAttribute.Configuration));
         }
 
         private static void TestConstructors((Type Type, SpeckAttribute Attribute) tuple)
         {
             var (type, attribute) = tuple;
-            var constructors = type.GetConstructors().ToList().AsReadOnly();            
+            var constructors = type.GetConstructors().ToList().AsReadOnly();
 
             if (attribute is SpeckyConfigurationAttribute)
             {

@@ -1,5 +1,6 @@
 ﻿using Specky.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Specky.DI
 {
@@ -46,5 +47,18 @@ namespace Specky.DI
 
         public Type ParameterType { get; }
         public string ConfigurationName { get; }
+    }
+
+    internal class InjectFactoryModel : InjectionModel
+    {
+        public InjectFactoryModel(Func<IEnumerable<Type>> getParameters, Func<IEnumerable<Type>, object> getFactorySpeck, Type type, DeliveryMode deliveryMode, string configuration) 
+            : base(type, deliveryMode, default, default, configuration)
+        {
+            GetParameters = getParameters;
+            GetFactorySpeck = getFactorySpeck;
+        }
+
+        public Func<IEnumerable<Type>> GetParameters { get; }
+        public Func<IEnumerable<Type>, object> GetFactorySpeck { get; }
     }
 }

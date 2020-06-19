@@ -1,5 +1,6 @@
 ﻿using Specky.Attributes;
 using Specky.DI;
+using Specky.Dtos;
 using Specky.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,11 @@ namespace Specky
 {
     public sealed class SpeckyContainer
     {
-        internal HashSet<InjectionModel> InjectionModels { get; } = new HashSet<InjectionModel>();
-
         SpeckyContainer() { }
         static public SpeckyContainer Instance { get; } = new SpeckyContainer();
+        internal HashSet<InjectionModel> InjectionModels { get; } = new HashSet<InjectionModel>();
         public string DefaultConfigurationName { get; private set; }
-
+        public IEnumerable<SpeckDto> InjectedSpecks => InjectionModels.Select(x => new SpeckDto(x));
         public void InjectSpeck(Type type, string speckName = "") => InjectSpeck(new InjectionModel(type, default, default, speckName, default));
 
         internal void InjectSpeck(InjectionModel injectionModel)
@@ -37,6 +37,8 @@ namespace Specky
         public object GetSpeck(Type type, string configurationName = "")
         {
             if (string.IsNullOrWhiteSpace(configurationName)) configurationName = DefaultConfigurationName;
+
+            if (TryGetFactorySpeck(type, out object factorySpeck)) return factorySpeck;
 
             if (TryGetConfigurationParameters(type, out object parameters, configurationName)) return parameters;
 
@@ -64,6 +66,30 @@ namespace Specky
             }
 
             return speck;
+        }
+
+        private bool TryGetFactorySpeck(Type type, out object factorySpeck)
+        {
+            IEnumerable<InjectFactoryModel> factoryInjectionModels;
+
+            lock (this)
+            {
+                factoryInjectionModels = InjectionModels
+                                       .Where(x => x is InjectFactoryModel model)
+                                       .Select(x => (InjectFactoryModel)x)
+                                       .ToList()
+                                       .AsReadOnly();
+            }
+
+            var factoryInjectionModel = factoryInjectionModels.Where(x => x.Type == type).FirstOrDefault();
+            if (factoryInjectionModel == null)
+            {
+                factorySpeck = null;
+                return false;
+            }
+
+            factorySpeck = factoryInjectionModel.GetFactorySpeck.Invoke(factoryInjectionModel.GetParameters.Invoke());
+            return factorySpeck != null;
         }
 
         public Task<object> GetSpeckAsync(Type type)

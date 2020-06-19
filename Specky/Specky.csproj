@@ -11,9 +11,9 @@
     <RepositoryType>dotnet standard library</RepositoryType>
     <PackageTags>DI, Dependency Injection, Specky, Speck</PackageTags>
     <PackageReleaseNotes>SpeckyConditionAttribute (Customizable to allow specky to inject based on conditions)</PackageReleaseNotes>
-    <AssemblyVersion>1.0.5.8</AssemblyVersion>
-    <FileVersion>1.0.5.8</FileVersion>
-    <Version>1.0.5.8</Version>
+    <AssemblyVersion>1.0.6.10</AssemblyVersion>
+    <FileVersion>1.0.6.10</FileVersion>
+    <Version>1.0.6.10</Version>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression></PackageLicenseExpression>
