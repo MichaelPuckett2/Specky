@@ -44,10 +44,13 @@
 --------------------------------------------------------------------------------------------------------------------------
 
 Speck injection by configuration using Speck(configuration: "ConfigurationName").
+
 Speck injection by name using SpeckName("NameofSpeck").
+
 Speck injection using factories...
 
-Make a SpeckyFactory by applying the [SpeckyFactory] attribute.  In the example below Specky calls GetMapper to inject the IMapper dynamically and injects the appropriate speck for EntityConfigurer automatically when calling the method.
+Make a SpeckyFactory by applying the [SpeckyFactory] attribute.
+In the example below Specky calls GetMapper to inject the IMapper dynamically and injects the appropriate speck for EntityConfigurer automatically when calling the method.
 
         [SpeckyFactory]
         public class EntityMapFactory
