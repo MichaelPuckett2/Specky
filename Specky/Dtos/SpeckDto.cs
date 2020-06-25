@@ -1,4 +1,5 @@
 ﻿using Specky.DI;
+using Specky.Enums;
 using System;
 
 namespace Specky.Dtos
@@ -8,8 +9,9 @@ namespace Specky.Dtos
         public object Instance { get; }
         public bool IsSingleton { get; }
         public string Configuration { get; }
-        public string SpeckName { get; private set; }
+        public string SpeckName { get; set; }
         public Type Type { get; }
+        public DeliveryMode DeliveryMode { get; }
 
         internal SpeckDto(InjectionModel  injectionModel)
         {
@@ -20,6 +22,7 @@ namespace Specky.Dtos
             Configuration = injectionModel.Configuration;
             SpeckName = injectionModel.SpeckName;
             Type = injectionModel.Type;
+            DeliveryMode = injectionModel.DeliveryMode;
         }
     }
 }
