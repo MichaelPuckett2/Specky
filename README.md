@@ -2,6 +2,20 @@
 
 ## Simplified injection:
 
+To start Specky up just call the boot strapper at the beginning of your application.
+
+        SpeckyAutoStrapper.Start();
+
+If you want to Speck multiple assemblies you will need to reference those assemblies in this call.
+
+        SpeckyAutoStrapper.Start(new Assembly[]
+        {
+            typeof(Program).Assembly,
+            typeof(Global.Models.Dtos.PersonDto).Assembly
+        });
+
+--------------------------------------------------------------------------------------------------------------------------
+
 1. Add an interface.
 
         public interface ILogger
