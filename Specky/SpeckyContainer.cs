@@ -38,21 +38,25 @@ namespace Specky
         {
             if (string.IsNullOrWhiteSpace(configurationName)) configurationName = DefaultConfigurationName;
 
+            if (TryGetInstantiatedSpeck(type, configurationName, out object speck)) return speck;
+
             if (TryGetFactorySpeck(type, out object factorySpeck)) return factorySpeck;
 
             if (TryGetConfigurationParameters(type, out object parameters, configurationName)) return parameters;
-
-            if (TryGetInstantiatedSpeck(type, configurationName, out object speck)) return speck;
 
             GetExistingModel(type, configurationName, out InjectionModel uninstantiatedModel);
 
             switch (uninstantiatedModel.DeliveryMode)
             {
                 case DeliveryMode.PerRequest:
+                case DeliveryMode.Scoped:
+                case DeliveryMode.Transient:
+                case DeliveryMode.DataSet:
                     speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck, HasParameterConfiguration, configurationName);
                     break;
 
                 case DeliveryMode.SingleInstance:
+                case DeliveryMode.Singleton:
                 default:
                     speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck, HasParameterConfiguration, configurationName);
                     var (speckType, deliveryMode, _, speckName, configuration) = uninstantiatedModel;
@@ -75,10 +79,10 @@ namespace Specky
             lock (this)
             {
                 factoryInjectionModels = InjectionModels
-                                       .Where(x => x is InjectFactoryModel model)
-                                       .Select(x => (InjectFactoryModel)x)
-                                       .ToList()
-                                       .AsReadOnly();
+                                        .Where(x => x is InjectFactoryModel model)
+                                        .Select(x => (InjectFactoryModel)x)
+                                        .ToList()
+                                        .AsReadOnly();
             }
 
             var factoryInjectionModel = factoryInjectionModels.Where(x => x.Type == type).FirstOrDefault();
@@ -88,7 +92,12 @@ namespace Specky
                 return false;
             }
 
-            factorySpeck = factoryInjectionModel.GetFactorySpeck.Invoke(factoryInjectionModel.GetParameters.Invoke());
+            (object tupledFactorySpeck, DeliveryMode deliveryMode, string speckName, string configuration) = factoryInjectionModel.GetFactorySpeck.Invoke(factoryInjectionModel.GetParameters.Invoke());
+            if (deliveryMode == DeliveryMode.SingleInstance)
+            {
+                InjectSpeck(new InjectionModel(tupledFactorySpeck.GetType(), DeliveryMode.SingleInstance, tupledFactorySpeck, speckName, configuration));
+            }
+            factorySpeck = tupledFactorySpeck;
             return factorySpeck != null;
         }
 
@@ -100,13 +109,13 @@ namespace Specky
             lock (this)
             {
                 var configedSpeck = InjectionModels
-                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance))
+                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance || x.DeliveryMode == DeliveryMode.Singleton))
                        .Where(x => x.Configuration == configuration)
                        .Select(x => x.Instance)
                        .FirstOrDefault();
 
                 speck = configedSpeck ?? InjectionModels
-                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance))
+                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance || x.DeliveryMode == DeliveryMode.Singleton))
                        .Where(x => string.IsNullOrWhiteSpace(configuration))
                        .Select(x => x.Instance)
                        .FirstOrDefault();

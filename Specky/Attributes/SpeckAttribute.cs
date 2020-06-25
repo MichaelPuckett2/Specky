@@ -4,9 +4,10 @@ using System;
 namespace Specky.Attributes
 {
     /// <summary>
-    /// Injects a type as a Speck dependency
+    /// Injects a type as a Speck dependency.
+    /// Can also be used on SpeckyFactory to represent the injeciton method and type of Speck captured.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class SpeckAttribute : Attribute
     {
         public SpeckAttribute(DeliveryMode deliveryMode = default, string configuration = "")

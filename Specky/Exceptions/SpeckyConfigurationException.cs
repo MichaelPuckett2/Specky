@@ -10,7 +10,7 @@ namespace Specky.Exceptions
 
     public class SpeckyFactoryMethodNotFoundException : Exception
     {
-        public SpeckyFactoryMethodNotFoundException(string factoryMethod, Type type) 
-            : base($"Method: {factoryMethod} was not found on {nameof(SpeckyFactoryAttribute)} | {type.Name}") { }
+        public SpeckyFactoryMethodNotFoundException(Type type) 
+            : base($"No factory method found for {nameof(SpeckyFactoryAttribute)} | {type.Name}") { }
     }
 }

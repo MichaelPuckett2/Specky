@@ -54,7 +54,7 @@ namespace Specky.DI
                     InjectNameSpeck(type, attribute, nameAttribute);
                     break;
 
-                case SpeckConditionAttribute conditionAttribute:
+                case SpeckyConditionAttribute conditionAttribute:
                     InjectConditionSpeck(type, attribute, conditionAttribute);
                     break;
 
@@ -69,24 +69,94 @@ namespace Specky.DI
         {
             InjectDefaultSpeck(type, attribute);
             MethodInfo methodInfo;
+
+            if (TryGetMethodFromName(type, speckyFactoryAttribute, out MethodInfo methodInfoFromName))
+            {
+                methodInfo = methodInfoFromName;
+            }
+            else if (TryGetMethodFromAttribute(type, out MethodInfo methodInfoFromAttribute))
+            {
+                methodInfo = methodInfoFromAttribute;
+            }
+            else
+            {
+                throw new SpeckyFactoryMethodNotFoundException(type);
+            }
+
+            var speckType = methodInfo.ReturnType;
+            var getParameters = new Func<IEnumerable<Type>>(() => methodInfo.GetParameters().Select(x => x.ParameterType));
+            var getFactorySpeck = new Func<IEnumerable<Type>, (object Speck, DeliveryMode deliveryMode, string speckName, string configuration)>((types) =>
+            {
+                var specks = new List<object>();
+                foreach (var t in types) specks.Add(SpeckyContainer.Instance.GetSpeck(t));
+
+                object speck;
+                DeliveryMode deliveryMode;
+                string speckName;
+                string configuration;
+
+                speck = methodInfo.Invoke(SpeckyContainer.Instance.GetSpeck(type), specks.ToArray());
+                switch (methodInfo.GetCustomAttribute<SpeckAttribute>())
+                {
+                    case SpeckyFactoryAttribute speckyFactory:
+                        deliveryMode = speckyFactory.DeliveryMode;
+                        speckName = speckyFactory.SpeckName;
+                        configuration = speckyFactory.Configuration;
+                        break;
+
+                    case SpeckNameAttribute speckNameAttribute:
+                        deliveryMode = speckNameAttribute.DeliveryMode;
+                        speckName = speckNameAttribute.SpeckName;
+                        configuration = speckNameAttribute.Configuration;
+                        break;
+
+                    case SpeckAttribute speckAttribute:
+                        deliveryMode = speckAttribute.DeliveryMode;
+                        speckName = default;
+                        configuration = speckAttribute.Configuration;
+                        break;
+
+                    default:
+                        deliveryMode = DeliveryMode.SingleInstance;
+                        speckName = default;
+                        configuration = default;
+                        break;
+                }
+
+                return (speck, deliveryMode, speckName, configuration);
+            });
+
+            SpeckyContainer.Instance.InjectSpeck(new InjectFactoryModel(getParameters, getFactorySpeck, speckType, attribute.DeliveryMode, attribute.Configuration));
+        }
+
+        private static bool TryGetMethodFromName(Type type, SpeckyFactoryAttribute speckyFactoryAttribute, out MethodInfo methodInfo)
+        {
             try
             {
                 methodInfo = type.GetMethod(speckyFactoryAttribute.FactoryMethodName);
             }
             catch
             {
-                throw new SpeckyFactoryMethodNotFoundException(speckyFactoryAttribute.FactoryMethodName, type);
+                methodInfo = default;
+                return false;
             }
 
-            var speckType = methodInfo.ReturnType;
-            var getParameters = new Func<IEnumerable<Type>>(() => methodInfo.GetParameters().Select(x => x.ParameterType));
-            var getFactorySpeck = new Func<IEnumerable<Type>, object>((types) =>
+            return true;
+        }
+
+        private bool TryGetMethodFromAttribute(Type type, out MethodInfo methodInfo)
+        {
+            try
             {
-                var specks = new List<object>();
-                foreach (var t in types) specks.Add(SpeckyContainer.Instance.GetSpeck(t));
-                return methodInfo.Invoke(SpeckyContainer.Instance.GetSpeck(type), specks.ToArray());
-            });
-            SpeckyContainer.Instance.InjectSpeck(new InjectFactoryModel(getParameters, getFactorySpeck, speckType, attribute.DeliveryMode, attribute.Configuration));
+                methodInfo = type.GetMethods().Where(x => x.GetCustomAttribute<SpeckAttribute>() != null).FirstOrDefault();
+            }
+            catch
+            {
+                methodInfo = default;
+                return false;
+            }
+
+            return methodInfo != null;
         }
 
         private static void InjectDefaultSpeck(Type type, SpeckAttribute attribute)
@@ -94,7 +164,7 @@ namespace Specky.DI
             SpeckyContainer.Instance.InjectSpeck(new InjectionModel(type, attribute.DeliveryMode, default, default, attribute.Configuration));
         }
 
-        private static void InjectConditionSpeck(Type type, SpeckAttribute attribute, SpeckConditionAttribute conditionAttribute)
+        private static void InjectConditionSpeck(Type type, SpeckAttribute attribute, SpeckyConditionAttribute conditionAttribute)
         {
             if (conditionAttribute.TestCondition())
             {
@@ -162,7 +232,7 @@ namespace Specky.DI
             }
             if (failedCount == constructors.Count)
             {
-                throw new Exception($"Specky has examined all possible constructors for {type.Name}.\nThere are no registered types to warrant initialization of any overloaded constructor.\nParameters expected:\n{parameters.ToString()}");
+                throw new Exception($"Specky has examined all possible constructors for {type.Name}.\nThere are no registered types to warrant initialization of any overloaded constructor.\nParameters missing associated Specks:\n{parameters}\nMake sure the SpeckAttribute is added to the class that should be injected.");
             }
         }
     }

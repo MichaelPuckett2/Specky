@@ -14,7 +14,9 @@ namespace Specky.Dtos
         internal SpeckDto(InjectionModel  injectionModel)
         {
             Instance = injectionModel.Instance;
-            IsSingleton = injectionModel.DeliveryMode != Enums.DeliveryMode.PerRequest;
+            IsSingleton = injectionModel.DeliveryMode != Enums.DeliveryMode.PerRequest
+                       && injectionModel.DeliveryMode != Enums.DeliveryMode.Transient
+                       && injectionModel.DeliveryMode != Enums.DeliveryMode.Scoped;
             Configuration = injectionModel.Configuration;
             SpeckName = injectionModel.SpeckName;
             Type = injectionModel.Type;

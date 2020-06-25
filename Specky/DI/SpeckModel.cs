@@ -51,7 +51,7 @@ namespace Specky.DI
 
     internal class InjectFactoryModel : InjectionModel
     {
-        public InjectFactoryModel(Func<IEnumerable<Type>> getParameters, Func<IEnumerable<Type>, object> getFactorySpeck, Type type, DeliveryMode deliveryMode, string configuration) 
+        public InjectFactoryModel(Func<IEnumerable<Type>> getParameters, Func<IEnumerable<Type>, (object Speck, DeliveryMode deliveryMode, string speckName, string configuration)> getFactorySpeck, Type type, DeliveryMode deliveryMode, string configuration) 
             : base(type, deliveryMode, default, default, configuration)
         {
             GetParameters = getParameters;
@@ -59,6 +59,6 @@ namespace Specky.DI
         }
 
         public Func<IEnumerable<Type>> GetParameters { get; }
-        public Func<IEnumerable<Type>, object> GetFactorySpeck { get; }
+        public Func<IEnumerable<Type>, (object Speck, DeliveryMode deliveryMode, string speckName, string configuration)> GetFactorySpeck { get; }
     }
 }
