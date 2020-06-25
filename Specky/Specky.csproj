@@ -11,10 +11,11 @@
     <RepositoryType>dotnet standard library</RepositoryType>
     <PackageTags>DI, Dependency Injection, Specky, Speck</PackageTags>
     <PackageReleaseNotes>Updated SpeckyFactory to include SpeckAttribute on factory method.
-Added DeliverMode options to properly register Specks in AspNetCore.</PackageReleaseNotes>
+Added DeliverMode options to properly register Specks in AspNetCore.
+Added DevliveryMode to SpeckDto</PackageReleaseNotes>
     <AssemblyVersion>1.0.8.0</AssemblyVersion>
-    <FileVersion>1.0.8.0</FileVersion>
-    <Version>1.0.8</Version>
+    <FileVersion>1.0.9.0</FileVersion>
+    <Version>1.0.9</Version>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageLicenseExpression></PackageLicenseExpression>
