@@ -10,10 +10,11 @@
     <RepositoryUrl>https://github.com/MichaelPuckett2/Specky</RepositoryUrl>
     <RepositoryType>dotnet standard library</RepositoryType>
     <PackageTags>DI, Dependency Injection, Specky, Speck</PackageTags>
-    <PackageReleaseNotes>SpeckyConditionAttribute (Customizable to allow specky to inject based on conditions)</PackageReleaseNotes>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
-    <FileVersion>1.0.7.11</FileVersion>
-    <Version>1.0.7</Version>
+    <PackageReleaseNotes>Updated SpeckyFactory to include SpeckAttribute on factory method.
+Added DeliverMode options to properly register Specks in AspNetCore.</PackageReleaseNotes>
+    <AssemblyVersion>1.0.8.0</AssemblyVersion>
+    <FileVersion>1.0.8.0</FileVersion>
+    <Version>1.0.8</Version>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression></PackageLicenseExpression>
