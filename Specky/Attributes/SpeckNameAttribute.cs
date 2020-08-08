@@ -7,7 +7,7 @@ namespace Specky.Attributes
     /// </summary>
     public class SpeckNameAttribute : SpeckAttribute
     {
-        public SpeckNameAttribute(string speckName, DeliveryMode deliveryMode = default, string configuration = "") : base(deliveryMode, configuration)
+        public SpeckNameAttribute(string speckName, Lifetime deliveryMode = default, string configuration = "") : base(deliveryMode, configuration)
         {
             SpeckName = speckName;
         }

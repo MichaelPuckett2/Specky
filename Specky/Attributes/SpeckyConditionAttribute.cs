@@ -7,7 +7,7 @@ namespace Specky.Attributes
     /// </summary>
     abstract public class SpeckyConditionAttribute : SpeckAttribute
     {
-        public SpeckyConditionAttribute(DeliveryMode deliveryMode = default, string configuration = "") : base(deliveryMode, configuration) { }
+        public SpeckyConditionAttribute(Lifetime deliveryMode = default, string configuration = "") : base(deliveryMode, configuration) { }
         abstract public bool TestCondition();
     }
 }

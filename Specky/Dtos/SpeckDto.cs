@@ -1,28 +1,52 @@
-﻿using Specky.DI;
-using Specky.Enums;
+﻿using Specky.Enums;
 using System;
 
 namespace Specky.Dtos
 {
+    /// <summary>
+    /// The Speck and related configurations.
+    /// </summary>
     public class SpeckDto
     {
-        public object Instance { get; }
-        public bool IsSingleton { get; }
-        public string Configuration { get; }
-        public string SpeckName { get; set; }
-        public Type Type { get; }
-        public DeliveryMode DeliveryMode { get; }
-
-        internal SpeckDto(InjectionModel  injectionModel)
+        internal SpeckDto(
+            Type type,
+            Lifetime lifeTIme,
+            Role role,
+            string configuration,
+            string name,
+            object instance)
         {
-            Instance = injectionModel.Instance;
-            IsSingleton = injectionModel.DeliveryMode != Enums.DeliveryMode.PerRequest
-                       && injectionModel.DeliveryMode != Enums.DeliveryMode.Transient
-                       && injectionModel.DeliveryMode != Enums.DeliveryMode.Scoped;
-            Configuration = injectionModel.Configuration;
-            SpeckName = injectionModel.SpeckName;
-            Type = injectionModel.Type;
-            DeliveryMode = injectionModel.DeliveryMode;
+            Type = type;
+            Lifetime = lifeTIme;
+            Role = role;
+            Configuration = configuration;
+            Name = name;
+            Instance = instance;
         }
+
+        /// <summary>
+        /// The Type of Speck.
+        /// </summary>
+        public Type Type { get; }
+        /// <summary>
+        /// The lifetime of the Speck.
+        /// </summary>
+        public Lifetime Lifetime { get; }
+        /// <summary>
+        /// The role the Speck is configured to run as.
+        /// </summary>
+        public Role Role { get; }
+        /// <summary>
+        /// The configuration required to inject the Speck.
+        /// </summary>
+        public string Configuration { get; }
+        /// <summary>
+        /// The name used to reference the Speck.
+        /// </summary>
+        public string Name { get; }
+        /// <summary>
+        /// The instantiated Speck; if available.
+        /// </summary>
+        public object Instance { get; }
     }
 }

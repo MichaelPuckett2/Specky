@@ -10,9 +10,9 @@ namespace Specky.DI
     internal class InjectionModel
     {
         public InjectionModel(Type type) : this(type, default) { }
-        public InjectionModel(Type type, DeliveryMode deliveryMode) : this(type, deliveryMode, default) { }
-        public InjectionModel(Type type, DeliveryMode deliveryMode, object instance) : this(type, deliveryMode, instance, default, default) { }
-        public InjectionModel(Type type, DeliveryMode deliveryMode, object instance, string speckName, string configuration)
+        public InjectionModel(Type type, Lifetime deliveryMode) : this(type, deliveryMode, default) { }
+        public InjectionModel(Type type, Lifetime deliveryMode, object instance) : this(type, deliveryMode, instance, default, default) { }
+        public InjectionModel(Type type, Lifetime deliveryMode, object instance, string speckName, string configuration)
         {
             Type = type;
             DeliveryMode = deliveryMode;
@@ -21,7 +21,7 @@ namespace Specky.DI
             Configuration = configuration;
         }
 
-        public void Deconstruct(out Type type, out DeliveryMode deliveryMode, out object instance, out string speckName, out string configuration)
+        public void Deconstruct(out Type type, out Lifetime deliveryMode, out object instance, out string speckName, out string configuration)
         {
             type = Type;
             deliveryMode = DeliveryMode;
@@ -32,14 +32,14 @@ namespace Specky.DI
 
         public Type Type { get; }
         public object Instance { get; }
-        public DeliveryMode DeliveryMode { get; }
+        public Lifetime DeliveryMode { get; }
         public string SpeckName { get; }
         public string Configuration { get; }
     }
 
     internal class InjectConfigurationModel : InjectionModel
     {
-        public InjectConfigurationModel(Type type, Type parameterType, string configurationName, string configuration) : base(type, DeliveryMode.DataSet, configuration)
+        public InjectConfigurationModel(Type type, Type parameterType, string configurationName, string configuration) : base(type, Lifetime.DataSet, configuration)
         {
             ParameterType = parameterType;
             ConfigurationName = configurationName;
@@ -51,7 +51,7 @@ namespace Specky.DI
 
     internal class InjectFactoryModel : InjectionModel
     {
-        public InjectFactoryModel(Func<IEnumerable<Type>> getParameters, Func<IEnumerable<Type>, (object Speck, DeliveryMode deliveryMode, string speckName, string configuration)> getFactorySpeck, Type type, DeliveryMode deliveryMode, string configuration) 
+        public InjectFactoryModel(Func<IEnumerable<Type>> getParameters, Func<IEnumerable<Type>, (object Speck, Lifetime deliveryMode, string speckName, string configuration)> getFactorySpeck, Type type, Lifetime deliveryMode, string configuration) 
             : base(type, deliveryMode, default, default, configuration)
         {
             GetParameters = getParameters;
@@ -59,6 +59,6 @@ namespace Specky.DI
         }
 
         public Func<IEnumerable<Type>> GetParameters { get; }
-        public Func<IEnumerable<Type>, (object Speck, DeliveryMode deliveryMode, string speckName, string configuration)> GetFactorySpeck { get; }
+        public Func<IEnumerable<Type>, (object Speck, Lifetime deliveryMode, string speckName, string configuration)> GetFactorySpeck { get; }
     }
 }

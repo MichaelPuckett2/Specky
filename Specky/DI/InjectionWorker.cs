@@ -85,13 +85,13 @@ namespace Specky.DI
 
             var speckType = methodInfo.ReturnType;
             var getParameters = new Func<IEnumerable<Type>>(() => methodInfo.GetParameters().Select(x => x.ParameterType));
-            var getFactorySpeck = new Func<IEnumerable<Type>, (object Speck, DeliveryMode deliveryMode, string speckName, string configuration)>((types) =>
+            var getFactorySpeck = new Func<IEnumerable<Type>, (object Speck, Lifetime deliveryMode, string speckName, string configuration)>((types) =>
             {
                 var specks = new List<object>();
                 foreach (var t in types) specks.Add(SpeckyContainer.Instance.GetSpeck(t));
 
                 object speck;
-                DeliveryMode deliveryMode;
+                Lifetime deliveryMode;
                 string speckName;
                 string configuration;
 
@@ -117,7 +117,7 @@ namespace Specky.DI
                         break;
 
                     default:
-                        deliveryMode = DeliveryMode.SingleInstance;
+                        deliveryMode = Lifetime.SingleInstance;
                         speckName = default;
                         configuration = default;
                         break;

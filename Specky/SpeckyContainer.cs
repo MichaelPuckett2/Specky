@@ -48,15 +48,15 @@ namespace Specky
 
             switch (uninstantiatedModel.DeliveryMode)
             {
-                case DeliveryMode.PerRequest:
-                case DeliveryMode.Scoped:
-                case DeliveryMode.Transient:
-                case DeliveryMode.DataSet:
+                case Lifetime.PerRequest:
+                case Lifetime.Scoped:
+                case Lifetime.Transient:
+                case Lifetime.DataSet:
                     speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck, HasParameterConfiguration, configurationName);
                     break;
 
-                case DeliveryMode.SingleInstance:
-                case DeliveryMode.Singleton:
+                case Lifetime.SingleInstance:
+                case Lifetime.Singleton:
                 default:
                     speck = SpeckActivator.InstantiateSpeck(type, uninstantiatedModel, HasSpeck, GetSpeck, HasParameterConfiguration, configurationName);
                     var (speckType, deliveryMode, _, speckName, configuration) = uninstantiatedModel;
@@ -92,10 +92,10 @@ namespace Specky
                 return false;
             }
 
-            (object tupledFactorySpeck, DeliveryMode deliveryMode, string speckName, string configuration) = factoryInjectionModel.GetFactorySpeck.Invoke(factoryInjectionModel.GetParameters.Invoke());
-            if (deliveryMode == DeliveryMode.SingleInstance)
+            (object tupledFactorySpeck, Lifetime deliveryMode, string speckName, string configuration) = factoryInjectionModel.GetFactorySpeck.Invoke(factoryInjectionModel.GetParameters.Invoke());
+            if (deliveryMode == Lifetime.SingleInstance)
             {
-                InjectSpeck(new InjectionModel(tupledFactorySpeck.GetType(), DeliveryMode.SingleInstance, tupledFactorySpeck, speckName, configuration));
+                InjectSpeck(new InjectionModel(tupledFactorySpeck.GetType(), Lifetime.SingleInstance, tupledFactorySpeck, speckName, configuration));
             }
             factorySpeck = tupledFactorySpeck;
             return factorySpeck != null;
@@ -109,13 +109,13 @@ namespace Specky
             lock (this)
             {
                 var configedSpeck = InjectionModels
-                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance || x.DeliveryMode == DeliveryMode.Singleton))
+                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == Lifetime.SingleInstance || x.DeliveryMode == Lifetime.Singleton))
                        .Where(x => x.Configuration == configuration)
                        .Select(x => x.Instance)
                        .FirstOrDefault();
 
                 speck = configedSpeck ?? InjectionModels
-                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == DeliveryMode.SingleInstance || x.DeliveryMode == DeliveryMode.Singleton))
+                       .Where(x => (x.Type == type || type.IsAssignableFrom(x.Type)) && (x.Instance != null) && (x.DeliveryMode == Lifetime.SingleInstance || x.DeliveryMode == Lifetime.Singleton))
                        .Where(x => string.IsNullOrWhiteSpace(configuration))
                        .Select(x => x.Instance)
                        .FirstOrDefault();

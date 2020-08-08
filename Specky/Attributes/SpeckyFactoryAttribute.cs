@@ -23,7 +23,7 @@ namespace Specky.Attributes
         /// The default contructor for SpeckyFactory.  If using this contructor then be sure to include a SpeckAttribute to the method used by the factory.  
         /// This is what Specky invokes to inject specific specks.
         /// </summary>
-        public SpeckyFactoryAttribute() : base(default, DeliveryMode.SingleInstance, default) { }
+        public SpeckyFactoryAttribute() : base(default, Lifetime.SingleInstance, default) { }
 
         /// <summary>
         /// Allows for customizing the speck method to determine the type of speck that will be injected.
@@ -33,7 +33,7 @@ namespace Specky.Attributes
         /// <param name="speckName">The name of the Speck returned from the factory method if required.</param>
         /// <param name="deliveryMode">The lifetime or deliverymode of the speck that Specky returns when needed.</param>
         /// <param name="configuration">The configuration used when Specky returns the speck.</param>
-        public SpeckyFactoryAttribute(string factoryMethodName, string speckName = "", DeliveryMode deliveryMode = DeliveryMode.SingleInstance, string configuration = "")
+        public SpeckyFactoryAttribute(string factoryMethodName, string speckName = "", Lifetime deliveryMode = Lifetime.SingleInstance, string configuration = "")
         : base(string.IsNullOrEmpty(speckName) ? default : speckName, deliveryMode, string.IsNullOrEmpty(configuration) ? default : configuration)
         {
             FactoryMethodName = factoryMethodName;
