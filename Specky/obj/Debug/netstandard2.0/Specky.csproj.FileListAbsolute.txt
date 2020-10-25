@@ -1,0 +1,9 @@
+C:\Repos\MichaelPuckett2\Specky2\Specky\obj\Debug\netstandard2.0\Specky.csprojAssemblyReference.cache
+C:\Repos\MichaelPuckett2\Specky2\Specky\obj\Debug\netstandard2.0\Specky.AssemblyInfoInputs.cache
+C:\Repos\MichaelPuckett2\Specky2\Specky\obj\Debug\netstandard2.0\Specky.AssemblyInfo.cs
+C:\Repos\MichaelPuckett2\Specky2\Specky\obj\Debug\netstandard2.0\Specky.csproj.CoreCompileInputs.cache
+C:\Repos\MichaelPuckett2\Specky2\Specky\bin\Debug\netstandard2.0\Specky.deps.json
+C:\Repos\MichaelPuckett2\Specky2\Specky\bin\Debug\netstandard2.0\Specky.dll
+C:\Repos\MichaelPuckett2\Specky2\Specky\bin\Debug\netstandard2.0\Specky.pdb
+C:\Repos\MichaelPuckett2\Specky2\Specky\obj\Debug\netstandard2.0\Specky.dll
+C:\Repos\MichaelPuckett2\Specky2\Specky\obj\Debug\netstandard2.0\Specky.pdb

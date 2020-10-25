@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZUzwk/a/DlAAiBdraYCeMjS9/iTCal/U8QisPEO+FPUIcjl6Drgw5yIOJs89qnkPF4/v+wjUK9T6jo7ejsWjnQ==",
+  "success": true,
+  "projectFilePath": "C:\\Repos\\MichaelPuckett2\\Specky2\\Specky\\Specky.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\micha\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\micha\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

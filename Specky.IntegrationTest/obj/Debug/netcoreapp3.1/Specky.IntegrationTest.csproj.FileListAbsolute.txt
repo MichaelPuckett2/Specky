@@ -1,0 +1,16 @@
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\obj\Debug\netcoreapp3.1\Specky.IntegrationTest.csprojAssemblyReference.cache
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\obj\Debug\netcoreapp3.1\Specky.IntegrationTest.AssemblyInfoInputs.cache
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\obj\Debug\netcoreapp3.1\Specky.IntegrationTest.AssemblyInfo.cs
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\obj\Debug\netcoreapp3.1\Specky.IntegrationTest.csproj.CoreCompileInputs.cache
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\bin\Debug\netcoreapp3.1\Specky.IntegrationTest.exe
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\bin\Debug\netcoreapp3.1\Specky.IntegrationTest.deps.json
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\bin\Debug\netcoreapp3.1\Specky.IntegrationTest.runtimeconfig.json
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\bin\Debug\netcoreapp3.1\Specky.IntegrationTest.runtimeconfig.dev.json
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\bin\Debug\netcoreapp3.1\Specky.IntegrationTest.dll
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\bin\Debug\netcoreapp3.1\Specky.IntegrationTest.pdb
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\bin\Debug\netcoreapp3.1\Specky.dll
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\bin\Debug\netcoreapp3.1\Specky.pdb
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\obj\Debug\netcoreapp3.1\Specky.IntegrationTest.csproj.CopyComplete
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\obj\Debug\netcoreapp3.1\Specky.IntegrationTest.dll
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\obj\Debug\netcoreapp3.1\Specky.IntegrationTest.pdb
+C:\Repos\MichaelPuckett2\Specky2\Specky.IntegrationTest\obj\Debug\netcoreapp3.1\Specky.IntegrationTest.genruntimeconfig.cache

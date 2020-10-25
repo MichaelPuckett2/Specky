@@ -1,21 +1,19 @@
 ﻿using Specky.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Specky.Attributes
 {
-    /// <summary>
-    /// Injects a type as a Speck dependency.
-    /// Can also be used on SpeckyFactory to represent the injeciton method and type of Speck captured.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public class SpeckAttribute : Attribute
     {
-        public SpeckAttribute(Lifetime deliveryMode = default, string configuration = "")
+        public SpeckAttribute(DeliveryMode deliveryMode = default, Type[] interfaces = null)
         {
             DeliveryMode = deliveryMode;
-            Configuration = configuration;
+            Interfaces = interfaces;
         }
-        public Lifetime DeliveryMode { get; }
-        public string Configuration { get; }
+
+        public DeliveryMode DeliveryMode { get; }
+        public IEnumerable<Type> Interfaces { get; }
     }
 }
