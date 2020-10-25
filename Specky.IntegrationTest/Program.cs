@@ -10,11 +10,11 @@ namespace Specky.IntegrationTest
         {
             Manager.Container
                 .SetSpeck<Worker>()
-                .AsSingleton()
+                .AsTransient()
                 .As<IWorker>()
                 .As<IWorker2>();
 
-            Manager.AutoStrapper.Start();
+            Specky.Manager.AutoStrapper.Start();
 
             var worker = Manager.Container.Get<IWorker>();
             worker.DoWork();
@@ -74,7 +74,7 @@ namespace Specky.IntegrationTest
         public void Write(string message);
     }
 
-    [Speck(DeliveryMode.Transient)]
+    [Speck(DeliveryMode.Singleton)]
     public class ConsoleWriter : IWriter
     {
         public void Write(string message)
