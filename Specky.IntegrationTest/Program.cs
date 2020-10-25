@@ -8,11 +8,11 @@ namespace Specky.IntegrationTest
     {
         static void Main(string[] args)
         {
-            //Manager.Container
-            //    .SetSpeck<Worker>()
-            //    .AsSingleton()
-            //    .As<IWorker>()
-            //    .As<IWorker2>();
+            Manager.Container
+                .SetSpeck<Worker>()
+                .AsSingleton()
+                .As<IWorker>()
+                .As<IWorker2>();
 
             Manager.AutoStrapper.Start();
 
@@ -47,8 +47,8 @@ namespace Specky.IntegrationTest
 
     //[Speck]
     //[Speck(DeliveryMode.Singleton, new[] { typeof(IWorker), typeof(IWorker2) })]
-    [Speck(DeliveryMode.Singleton, new[] { typeof(IWorker) })]
-    [Speck(DeliveryMode.Singleton, new[] { typeof(IWorker2) })]
+    //[Speck(DeliveryMode.Singleton, new[] { typeof(IWorker) })]
+    //[Speck(DeliveryMode.Singleton, new[] { typeof(IWorker2) })]
     public class Worker : IWorker, IWorker2
     {
         public Worker(IWriter writer)
