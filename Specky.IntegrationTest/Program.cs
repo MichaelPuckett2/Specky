@@ -1,5 +1,6 @@
 ﻿using Specky.Attributes;
 using Specky.Enums;
+using Specky.Extensions;
 using System;
 
 namespace Specky.IntegrationTest

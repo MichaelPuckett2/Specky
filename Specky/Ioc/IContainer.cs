@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Specky.Models;
+using System;
 
 namespace Specky.Ioc
 {

@@ -1,4 +1,5 @@
 ﻿using Specky.Exceptions;
+using Specky.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
