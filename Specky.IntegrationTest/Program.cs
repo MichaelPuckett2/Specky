@@ -1,7 +1,7 @@
-﻿using Specky.Attributes;
-using Specky.Enums;
-using Specky.Extensions;
+﻿using Specky.Extensions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Specky.IntegrationTest
 {
@@ -15,15 +15,10 @@ namespace Specky.IntegrationTest
                 .As<IWorker>()
                 .As<IWorker2>();
 
-            Specky.Manager.AutoStrapper.Start();
+            Manager.AutoStrapper.Start();
 
             var worker = Manager.Container.Get<IWorker>();
             worker.DoWork();
-
-            //var workerAgain = Manager.Container.Get<IWorker>();
-            //workerAgain.DoWork();
-
-            //Console.WriteLine(worker == workerAgain);
 
             var worker2 = Manager.Container.Get<IWorker2>();
             worker2.DoWork2();
@@ -36,51 +31,68 @@ namespace Specky.IntegrationTest
         }
     }
 
-    public interface IWorker
+    public class Person
     {
-        void DoWork();
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
     }
 
-    public interface IWorker2
+    public interface IValidate<T>
     {
-        void DoWork2();
+        bool Validate(T t);
     }
 
-    //[Speck]
-    //[Speck(DeliveryMode.Singleton, new[] { typeof(IWorker), typeof(IWorker2) })]
-    //[Speck(DeliveryMode.Singleton, new[] { typeof(IWorker) })]
-    //[Speck(DeliveryMode.Singleton, new[] { typeof(IWorker2) })]
-    public class Worker : IWorker, IWorker2
+    public class Greater10Validator : IValidate<Person>
     {
-        public Worker(IWriter writer)
+        public bool Validate(Person t) => t.Age > 10;
+    }
+
+    public class NameMichaelValidator : IValidate<Person>
+    {
+        public bool Validate(Person t) => t.FirstName != "Michael";
+    }
+
+    public class NameJohnValidator : IValidate<Person>
+    {
+        public bool Validate(Person t) => t.FirstName != "John";
+    }
+
+    public class MichaelValidation : IValidate<Person>
+    {
+        public MichaelValidation(IEnumerable<IValidate<Person>> validators)
         {
-            Writer = writer;
+            Validators = validators.ToList().AsReadOnly();
         }
 
-        public IWriter Writer { get; }
+        public IEnumerable<IValidate<Person>> Validators { get; }
 
-        public void DoWork()
+        public bool Validate(Person t)
         {
-            Writer.Write($"{nameof(Worker)} is working.");
-        }
-
-        public void DoWork2()
-        {
-            Writer.Write($"{nameof(Worker)} is working on 2.");
+            foreach (var validator in Validators)
+            {
+                if (!validator.Validate(t)) return false;
+            }
+            return true;
         }
     }
 
-    public interface IWriter
+    public class JohnValidation : IValidate<Person>
     {
-        public void Write(string message);
-    }
-
-    [Speck(DeliveryMode.Singleton)]
-    public class ConsoleWriter : IWriter
-    {
-        public void Write(string message)
+        public JohnValidation(IEnumerable<IValidate<Person>> validators)
         {
-            Console.WriteLine(message);
+            Validators = validators.ToList().AsReadOnly();
+        }
+
+        public IEnumerable<IValidate<Person>> Validators { get; }
+
+        public bool Validate(Person t)
+        {
+            foreach (var validator in Validators)
+            {
+                if (!validator.Validate(t)) return false;
+            }
+            return true;
         }
     }
 }

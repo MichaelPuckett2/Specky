@@ -9,6 +9,7 @@ namespace Specky.Models
     public class Speck
     {
         private readonly List<Type> interfaces = new List<Type>();
+        private readonly List<string> profiles = new List<string>();
 
         /// <summary>
         /// The Type this Speck will instantiate.
@@ -31,6 +32,12 @@ namespace Specky.Models
         /// </summary>
         public object Instance { get; internal set; }
 
+        /// <summary>
+        /// Enumeration of profiles the Speck is injected against.
+        /// If empty the Speck will be injected as primary.
+        /// </summary>
+        public IEnumerable<string> Profiles => profiles.ToList().AsReadOnly();
+
         internal void AddInterface<T>() => AddInterface(typeof(T));
         internal void AddInterface(Type type)
         {
@@ -43,5 +50,7 @@ namespace Specky.Models
                 throw new NotAnInterfaceSpeckException(type);
             }
         }
+
+        internal void AddProfile(string profile) => profiles.Add(profile);
     }
 }
