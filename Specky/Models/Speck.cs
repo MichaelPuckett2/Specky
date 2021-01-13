@@ -39,6 +39,7 @@ namespace Specky.Models
         public IEnumerable<string> Profiles => profiles.ToList().AsReadOnly();
 
         internal void AddInterface<T>() => AddInterface(typeof(T));
+
         internal void AddInterface(Type type)
         {
             if (type.IsInterface)

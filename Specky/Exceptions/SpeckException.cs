@@ -35,7 +35,7 @@ namespace Specky.Exceptions
 
     public class NoValidConstructorFound : SpeckException
     {
-        internal NoValidConstructorFound(Type type, [CallerMemberName] string caller = "") : base($"Specky did not find a valid constrcutor to instantiate the type {type.Name}. @{caller}.")
+        internal NoValidConstructorFound(Type type, [CallerMemberName] string caller = "") : base($"Specky did not find a valid constuctor to instantiate the type {type.Name}. Verify the parameters for at least one constructor has been Specked. @{caller}.")
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
         }

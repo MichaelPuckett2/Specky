@@ -1,4 +1,6 @@
-﻿using Specky.Extensions;
+﻿using Specky.Attributes;
+using Specky.Enums;
+using Specky.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,9 +45,10 @@ namespace Specky.IntegrationTest
         bool Validate(T t);
     }
 
+    [Speck]
     public class Greater10Validator : IValidate<Person>
     {
-        public bool Validate(Person t) => t.Age > 10;
+        public bool Validate(Person t) => t.Age > 18;
     }
 
     public class NameMichaelValidator : IValidate<Person>
@@ -58,6 +61,7 @@ namespace Specky.IntegrationTest
         public bool Validate(Person t) => t.FirstName != "John";
     }
 
+    [Speck]
     public class MichaelValidation : IValidate<Person>
     {
         public MichaelValidation(IEnumerable<IValidate<Person>> validators)
