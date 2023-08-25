@@ -3,7 +3,7 @@
 > .Net 5+ has it's own DI container and should be used instead of Specky.
 > If you're using .NET 6 and up then preferably use Specky7, which is just a helper for the built in .NET IServiceCollection.
 
-> [GitHub](https://github.com/MichaelPuckett2/Specky7) | [NuGet](https://www.nuget.org/packages/Specky6) | [How to use Specky7](https://github.com/MichaelPuckett2/Specky7#readme)
+> [GitHub](https://github.com/MichaelPuckett2/Specky7) | [NuGet](https://www.nuget.org/packages/Specky7) | [How to use Specky7](https://github.com/MichaelPuckett2/Specky7#readme)
 
 ---
 # SpeckyStandard
